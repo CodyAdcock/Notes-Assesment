@@ -11,19 +11,23 @@ import UIKit
 class NoteTableViewController: UITableViewController, UISearchResultsUpdating {
     
     //SearchBar stuff
+    //make instance of Search Controller
+    
     let searchController = UISearchController(searchResultsController: nil)
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        //have the serch controller have it's own searchResultsUpdating
+        searchController.searchResultsUpdater = self as UISearchResultsUpdating
+        //aesthetic stuff
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.dimsBackgroundDuringPresentation = false
+        //put a searchbar at the top of the tableView
+        tableView.tableHeaderView = searchController.searchBar
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        searchController.searchResultsUpdater = self as UISearchResultsUpdating
-        searchController.hidesNavigationBarDuringPresentation = false
-        searchController.dimsBackgroundDuringPresentation = false
-        tableView.tableHeaderView = searchController.searchBar
         
         tableView.reloadData()
     }
@@ -31,7 +35,6 @@ class NoteTableViewController: UITableViewController, UISearchResultsUpdating {
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
         return NoteController.shared.filteredNotes.count
     }
 
@@ -43,7 +46,6 @@ class NoteTableViewController: UITableViewController, UISearchResultsUpdating {
         let note = NoteController.shared.filteredNotes[indexPath.row]
         //have the cell's text be the note Detail
         cell.textLabel?.text = note.detail
-        //COME BACK TO MAKE THAT LOOK GOOD IN THE CELL!
         return cell
     }
     
@@ -77,12 +79,16 @@ class NoteTableViewController: UITableViewController, UISearchResultsUpdating {
     */
     
     //MARK: - SearchBar
+    //updateSearchResults Fuction
     func updateSearchResults(for searchController: UISearchController){
+        ///it the search bar is not empty, fill a new filteredNotes arrat with array members from notes that match
         if let searchText = searchController.searchBar.text, !searchText.isEmpty{
             NoteController.shared.filteredNotes = NoteController.shared.notes.filter {detail in return detail.detail.lowercased().contains(searchText.lowercased())}
         }else{
+            //if it's empty the arrays are the same
             NoteController.shared.filteredNotes = NoteController.shared.notes
         }
+        //update the tableView UI as we filter
         tableView.reloadData()
     }
 
@@ -102,3 +108,4 @@ class NoteTableViewController: UITableViewController, UISearchResultsUpdating {
     
 
 }
+//send to karl

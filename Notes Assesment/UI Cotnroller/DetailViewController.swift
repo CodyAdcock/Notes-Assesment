@@ -11,7 +11,7 @@ import UIKit
 class DetailViewController: UIViewController {
 
     //landing pad
-    var note: Note?
+    var note: Note?    
     
     //IBOutlets
     @IBOutlet weak var detailTextView: UITextView!
