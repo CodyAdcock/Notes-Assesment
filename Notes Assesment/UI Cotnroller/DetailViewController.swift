@@ -16,7 +16,6 @@ class DetailViewController: UIViewController {
     //IBOutlets
     @IBOutlet weak var detailTextView: UITextView!
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
