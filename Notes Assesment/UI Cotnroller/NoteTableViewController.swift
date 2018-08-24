@@ -13,7 +13,7 @@ class NoteTableViewController: UITableViewController, UISearchResultsUpdating {
     //SearchBar stuff
     //make instance of Search Controller
     
-    let searchController = UISearchController(searchResultsController: nil)
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,18 +35,33 @@ class NoteTableViewController: UITableViewController, UISearchResultsUpdating {
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return NoteController.shared.filteredNotes.count
+        //Only use filteredNotes after we've filled it
+        if NoteController.shared.filteredNotes != []{
+            return NoteController.shared.filteredNotes.count
+        }else{
+            return NoteController.shared.notes.count
+        }
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         //reuse cells
         let cell = tableView.dequeueReusableCell(withIdentifier: "noteCell", for: indexPath)
-        //set the cell to the corresponding note
-        let note = NoteController.shared.filteredNotes[indexPath.row]
-        //have the cell's text be the note Detail
-        cell.textLabel?.text = note.detail
-        return cell
+        //only use filteredNotes after we've filled it
+        if NoteController.shared.filteredNotes != []{
+            //set the cell to the corresponding note
+            let note = NoteController.shared.filteredNotes[indexPath.row]
+            //have the cell's text be the note Detail
+            cell.textLabel?.text = note.detail
+            return cell
+        }else{
+            //set the cell to the corresponding note
+            let note = NoteController.shared.notes[indexPath.row]
+            //have the cell's text be the note Detail
+            cell.textLabel?.text = note.detail
+            return cell
+        }
+        
     }
     
 
@@ -54,12 +69,21 @@ class NoteTableViewController: UITableViewController, UISearchResultsUpdating {
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            //remove the proper note according to index path of the cell
-            NoteController.shared.notes.remove(at: indexPath.row)
+            //Only use filteredNotes after we've filled it
+            if NoteController.shared.filteredNotes != []{
+                //remove the proper note according to index path of the cell
+                let note = NoteController.shared.filteredNotes[indexPath.row]
+                NoteController.shared.deleteNote(note)
+            }else{
+                //remove the proper note according to index path of the cell
+                let note = NoteController.shared.notes[indexPath.row]
+                NoteController.shared.deleteNote(note)
+            }
+            
             tableView.deleteRows(at: [indexPath], with: .fade)
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
     }
 
 
@@ -79,6 +103,8 @@ class NoteTableViewController: UITableViewController, UISearchResultsUpdating {
     */
     
     //MARK: - SearchBar
+    
+    let searchController = UISearchController(searchResultsController: nil)
     //updateSearchResults Fuction
     func updateSearchResults(for searchController: UISearchController){
         ///it the search bar is not empty, fill a new filteredNotes arrat with array members from notes that match
@@ -100,8 +126,14 @@ class NoteTableViewController: UITableViewController, UISearchResultsUpdating {
         if segue.identifier == "toDetailVC"{
             let destinationVC = segue.destination as? DetailViewController
             guard let indexPath = tableView.indexPathForSelectedRow else {return}
-            let note = NoteController.shared.notes[indexPath.row]
-            destinationVC?.note = note
+            //Only use filteredNotes after we've filled it
+            if NoteController.shared.filteredNotes != []{
+                let note = NoteController.shared.filteredNotes[indexPath.row]
+                destinationVC?.note = note
+            }else{
+                let note = NoteController.shared.notes[indexPath.row]
+                destinationVC?.note = note
+            }
         }
         else{}
     }
