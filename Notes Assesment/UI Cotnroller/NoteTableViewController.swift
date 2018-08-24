@@ -8,7 +8,10 @@
 
 import UIKit
 
-class NoteTableViewController: UITableViewController {
+class NoteTableViewController: UITableViewController, UISearchResultsUpdating {
+    
+    //SearchBar stuff
+    let searchController = UISearchController(searchResultsController: nil)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -17,6 +20,11 @@ class NoteTableViewController: UITableViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        searchController.searchResultsUpdater = self as UISearchResultsUpdating
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.dimsBackgroundDuringPresentation = false
+        tableView.tableHeaderView = searchController.searchBar
+        
         tableView.reloadData()
     }
 
@@ -24,7 +32,7 @@ class NoteTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return NoteController.shared.notes.count
+        return NoteController.shared.filteredNotes.count
     }
 
     
@@ -32,7 +40,7 @@ class NoteTableViewController: UITableViewController {
         //reuse cells
         let cell = tableView.dequeueReusableCell(withIdentifier: "noteCell", for: indexPath)
         //set the cell to the corresponding note
-        let note = NoteController.shared.notes[indexPath.row]
+        let note = NoteController.shared.filteredNotes[indexPath.row]
         //have the cell's text be the note Detail
         cell.textLabel?.text = note.detail
         //COME BACK TO MAKE THAT LOOK GOOD IN THE CELL!
@@ -67,6 +75,16 @@ class NoteTableViewController: UITableViewController {
         return true
     }
     */
+    
+    //MARK: - SearchBar
+    func updateSearchResults(for searchController: UISearchController){
+        if let searchText = searchController.searchBar.text, !searchText.isEmpty{
+            NoteController.shared.filteredNotes = NoteController.shared.notes.filter {detail in return detail.detail.lowercased().contains(searchText.lowercased())}
+        }else{
+            NoteController.shared.filteredNotes = NoteController.shared.notes
+        }
+        tableView.reloadData()
+    }
 
     
     // MARK: - Navigation

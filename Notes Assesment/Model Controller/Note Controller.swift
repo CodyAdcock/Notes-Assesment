@@ -14,6 +14,7 @@ class NoteController{
     
     //Source of Truth
     var notes: [Note] = []
+    var filteredNotes: [Note] = []
     
     //Create
     func createNote(_ detail: String){
